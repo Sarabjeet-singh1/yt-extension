@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>YouTube Downloader</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>YouTube Downloader</h1>
+    </div>
+    
+    <div id="loading" class="loading hidden">
+      <div class="spinner"></div>
+      <p>Loading video info...</p>
+    </div>
+    
+    <div id="error" class="error hidden">
+      <p id="error-message"></p>
+    </div>
+    
+    <div id="video-info" class="video-info hidden">
+      <div class="thumbnail-container">
+        <img id="thumbnail" src="" alt="Video thumbnail">
+      </div>
+      <h2 id="video-title"></h2>
+      <p class="video-author" id="video-author"></p>
+      
+      <div class="format-section">
+        <h3>Select Format:</h3>
+        <div class="format-options">
+          <button class="format-btn selected" data-format="mp4">
+            <span>MP4 Video</span>
+          </button>
+          <button class="format-btn" data-format="mov">
+            <span>MOV Video</span>
+          </button>
+          <button class="format-btn" data-format="mp3">
+            <span>MP3 Audio</span>
+          </button>
+        </div>
+      </div>
+      
+      <div class="quality-section" id="quality-section">
+        <h3>Select Quality:</h3>
+        <div id="quality-options" class="quality-options">
+          <!-- Quality buttons will be inserted here -->
+        </div>
+      </div>
+      
+      <div class="download-section">
+        <button id="download-btn" class="download-btn">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="7 10 12 15 17 10"></polyline>
+            <line x1="12" y1="15" x2="12" y2="3"></line>
+          </svg>
+          <span>Download Video</span>
+        </button>
+      </div>
+      
+      <div id="server-warning" class="server-warning hidden">
+        <p>⚠️ Local server is not running. Please start it first:</p>
+        <code>npm start</code>
+      </div>
+      
+      <div id="download-status" class="download-status hidden">
+        <p id="status-message"></p>
+      </div>
+    </div>
+    
+    <div id="not-youtube" class="not-youtube hidden">
+      <p>Please open a YouTube video page to use this extension.</p>
+    </div>
+  </div>
+  
+  <script src="popup.js"></script>
+</body>
+</html>
