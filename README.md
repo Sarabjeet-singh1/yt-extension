@@ -1,9 +1,12 @@
-# Social Video Downloader Extension
+# Social Video Downloader Extension 🍎 Now with Safari Support
 
 A browser extension that allows you to download videos and audio from YouTube, X, and Instagram using yt-dlp.
 
+**Supported Browsers**: Chrome/Edge/Brave, Firefox, Safari (macOS)**
+
 ## Features
 
+- 🍎 **Full Safari (macOS) support**
 - 🎬 Download videos from YouTube, X, and Instagram as MP4 files
 - 🎵 Download audio as MP3 files
 - 📊 Multiple quality options (360p, 480p, 720p, 1080p, Max)
