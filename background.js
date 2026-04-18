@@ -1,6 +1,7 @@
 const SERVER_URL = 'http://localhost:3000';
+const extensionApi = globalThis.browser || globalThis.chrome;
 
-chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+extensionApi.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.action === 'downloadVideo') {
     handleDownload(request.data)
       .then(result => sendResponse(result))
@@ -9,7 +10,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   }
   
   if (request.action === 'openPopup') {
-    chrome.action.openPopup();
+    extensionApi.action.openPopup();
   }
   
   if (request.action === 'checkServer') {
@@ -35,7 +36,7 @@ async function checkServerHealth() {
 
 async function handleDownload(data) {
   try {
-    const { videoId, title, quality, format } = data;
+    const { videoId, url, source, title, quality, format } = data;
     
     // Check if server is running
     const healthCheck = await checkServerHealth();
@@ -62,6 +63,8 @@ async function handleDownload(data) {
       },
       body: JSON.stringify({
         videoId,
+        url,
+        source,
         title,
         quality,
         format: format || 'mp4'
@@ -91,6 +94,6 @@ async function handleDownload(data) {
   }
 }
 
-chrome.runtime.onInstalled.addListener(() => {
-  console.log('YouTube Video Downloader extension installed');
+extensionApi.runtime.onInstalled.addListener(() => {
+  console.log('Social Video Downloader extension installed');
 });

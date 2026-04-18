@@ -5,7 +5,8 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "install-ytdlp": "npm install -g yt-dlp || echo 'Please install yt-dlp manually'"
+    "install-ytdlp": "npm install -g yt-dlp || echo 'Please install yt-dlp manually'",
+    "safari:convert": "bash scripts/convert-safari.sh"
   },
   "keywords": ["youtube", "downloader", "yt-dlp"],
   "author": "",

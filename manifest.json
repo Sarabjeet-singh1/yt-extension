@@ -1,16 +1,23 @@
 {
   "manifest_version": 3,
-  "name": "YouTube Video Downloader",
+  "name": "Social Video Downloader",
   "version": "1.0.0",
-  "description": "Download YouTube videos in various quality options",
+  "description": "Download videos from YouTube, X, and Instagram in various quality options",
   "permissions": [
     "activeTab",
-    "downloads",
     "storage"
   ],
   "host_permissions": [
     "https://www.youtube.com/*",
     "https://youtube.com/*",
+    "https://i.ytimg.com/*",
+    "https://img.youtube.com/*",
+    "https://x.com/*",
+    "https://twitter.com/*",
+    "https://www.instagram.com/*",
+    "https://instagram.com/*",
+    "https://m.instagram.com/*",
+    "https://mobile.twitter.com/*",
     "http://localhost:3000/*"
   ],
   "action": {
@@ -28,7 +35,16 @@
   },
   "content_scripts": [
     {
-      "matches": ["https://www.youtube.com/*", "https://youtube.com/*"],
+      "matches": [
+        "https://www.youtube.com/*",
+        "https://youtube.com/*",
+        "https://x.com/*",
+        "https://twitter.com/*",
+        "https://www.instagram.com/*",
+        "https://instagram.com/*",
+        "https://m.instagram.com/*",
+        "https://mobile.twitter.com/*"
+      ],
       "js": ["content.js"],
       "css": ["content.css"],
       "run_at": "document_end"

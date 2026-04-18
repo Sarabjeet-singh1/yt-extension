@@ -1,12 +1,12 @@
-# YouTube Video Downloader Extension
+# Social Video Downloader Extension
 
-A browser extension that allows you to download YouTube videos and audio using yt-dlp.
+A browser extension that allows you to download videos and audio from YouTube, X, and Instagram using yt-dlp.
 
 ## Features
 
-- 🎬 Download YouTube videos as MP4 files
-- 🎵 Download YouTube audio as MP3 files
-- 📊 Multiple quality options (360p, 480p, 720p, 1080p)
+- 🎬 Download videos from YouTube, X, and Instagram as MP4 files
+- 🎵 Download audio as MP3 files
+- 📊 Multiple quality options (360p, 480p, 720p, 1080p, Max)
 - 🎨 Clean, modern user interface
 - 🔘 Download button integrated into YouTube's interface
 - 📱 Responsive popup design
@@ -67,6 +67,26 @@ The server will start on `http://localhost:3000`. Keep this terminal window open
 
 4. The extension will be loaded temporarily (until you restart Firefox)
 
+#### Safari (macOS)
+
+Safari uses an Xcode wrapper app for Web Extensions.
+
+1. Install Xcode (and command line tools):
+   - `xcode-select --install`
+
+2. Generate the Safari project:
+   - `npm run safari:convert`
+
+3. Open the generated project from the `safari/` folder in Xcode.
+
+4. In Xcode, select the macOS app target and click Run.
+
+5. Enable the extension in Safari:
+   - Safari > Settings > Extensions > enable "Social Video Downloader Safari Extension"
+
+6. Keep your local server running:
+   - `npm start`
+
 ## Usage
 
 ### Important: Start the Server First!
@@ -79,7 +99,10 @@ npm start
 
 ### Download Videos/Audio
 
-1. Navigate to any YouTube video page
+1. Navigate to a supported video page:
+   - YouTube (`youtube.com/watch` or `youtu.be`)
+   - X/Twitter post (`x.com/.../status/...` or `twitter.com/.../status/...`)
+   - Instagram post/reel (`instagram.com/p/...`, `instagram.com/reel/...`, or `instagram.com/tv/...`)
 
 2. You'll see a purple "Download" button added to the video controls
 
@@ -89,20 +112,18 @@ npm start
    - **MP4 Video** - Download video file
    - **MP3 Audio** - Download audio only
 
-5. **Select quality** (for MP4 only):
-   - 360p, 480p, 720p, or 1080p
+5. **Select quality** (for MP4/MOV):
+   - 360p, 480p, 720p, 1080p, or Max (best available)
 
 6. Click "Download Video" or "Download Audio"
 
-7. The file will be downloaded to the `downloads` folder in the extension directory
-
-8. A new tab will open with the download link (or check the `downloads` folder directly)
+7. The file will be downloaded to your system `Downloads` folder
 
 ## Important Notes
 
-⚠️ **Legal Disclaimer**: This extension is for educational purposes only. Please respect YouTube's Terms of Service and copyright laws. Only download videos you have permission to download.
+⚠️ **Legal Disclaimer**: This extension is for educational purposes only. Please respect platform Terms of Service and copyright laws. Only download videos you have permission to download.
 
-⚠️ **Download Method**: This extension uses yt-dlp to download actual video/audio files. A local Node.js server must be running for the extension to work. Downloads are saved to the `downloads` folder in the extension directory.
+⚠️ **Download Method**: This extension uses yt-dlp to download actual video/audio files. A local Node.js server must be running for the extension to work. Downloads are saved to your system Downloads folder.
 
 ⚠️ **Server Requirement**: The local server (running on port 3000) must be active for downloads to work. If the server is not running, you'll see a warning in the popup.
 
@@ -116,7 +137,7 @@ yt extension/
 ├── popup.html            # Popup interface HTML
 ├── popup.css             # Popup styling
 ├── popup.js              # Popup functionality
-├── content.js            # YouTube page integration
+├── content.js            # YouTube/X/Instagram page integration
 ├── content.css           # Download button styling
 ├── background.js         # Background service worker
 ├── downloads/            # Downloaded files (created automatically)
@@ -139,9 +160,9 @@ yt extension/
 - Verify installation by running `yt-dlp --version` in terminal
 - Restart the server after installing yt-dlp
 
-### Extension doesn't appear on YouTube
-- Refresh the YouTube page after installing the extension
-- Make sure you're on a video page (not the homepage)
+### Extension doesn't appear on supported pages
+- Refresh the YouTube/X/Instagram page after installing the extension
+- Make sure you're on a supported video/post URL
 - Check that the extension is enabled in your browser's extension settings
 
 ### Download fails or takes too long
@@ -150,9 +171,11 @@ yt extension/
 - Check the server terminal for error messages
 - Some videos may be restricted or unavailable for download
 
-### Popup shows "Not a YouTube page"
-- Make sure you're on a YouTube video page (URL should contain `/watch?v=`)
-- The extension only works on actual video pages, not playlists or channel pages
+### Popup shows "not supported" message
+- Make sure you're on one of:
+  - `youtube.com/watch` or `youtu.be`
+  - `x.com/.../status/...` or `twitter.com/.../status/...`
+  - `instagram.com/p/...`, `instagram.com/reel/...`, or `instagram.com/tv/...`
 
 ### Downloads folder is empty
 - Check the server terminal for error messages
@@ -169,12 +192,18 @@ To modify the extension:
 3. Click the refresh icon on the extension card
 4. Test your changes
 
+### Safari Development Notes
+
+- If you change Web Extension files (`manifest.json`, `popup.js`, `background.js`, etc.), run `npm run safari:convert` again to refresh the generated Safari project resources.
+- You can customize identity during conversion:
+  - `APP_NAME="My Safari App" BUNDLE_ID="com.example.myapp" npm run safari:convert`
+
 ## Privacy
 
 This extension:
 - Does not collect any personal data
 - Does not track your browsing history
-- Only activates on YouTube pages
+- Only activates on supported pages (YouTube, X/Twitter, Instagram)
 - Does not send data to external servers (except when opening the download service)
 
 ## License

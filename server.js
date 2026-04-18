@@ -11,10 +11,35 @@ const PORT = 3000;
 app.use(cors());
 app.use(express.json());
 
+// Root endpoint for quick browser checks
+app.get('/', (req, res) => {
+  res.json({
+    status: 'ok',
+    message: 'Social Video Downloader Server is running',
+    endpoints: {
+      health: 'GET /health',
+      download: 'POST /download'
+    }
+  });
+});
+
 // Get user's Downloads folder
 function getUserDownloadsFolder() {
   const homeDir = os.homedir();
   return path.join(homeDir, 'Downloads');
+}
+
+function sanitizeFilename(input) {
+  const fallback = 'video_download';
+  const safeInput = (input || fallback).toString();
+  const cleaned = safeInput
+    .replace(/[^a-z0-9\s]/gi, '_')
+    .replace(/\s+/g, '_')
+    .replace(/_+/g, '_')
+    .replace(/^_+|_+$/g, '')
+    .toLowerCase();
+
+  return cleaned || fallback;
 }
 
 // Check if yt-dlp is installed
@@ -30,10 +55,10 @@ function checkYtDlp(callback) {
 
 // Download video endpoint
 app.post('/download', (req, res) => {
-  const { videoId, title, quality, format } = req.body;
+  const { videoId, url, title, quality, format } = req.body;
   
-  if (!videoId) {
-    return res.status(400).json({ success: false, error: 'Video ID is required' });
+  if (!videoId && !url) {
+    return res.status(400).json({ success: false, error: 'Video URL is required' });
   }
 
   checkYtDlp((isInstalled) => {
@@ -44,8 +69,8 @@ app.post('/download', (req, res) => {
       });
     }
 
-    const videoUrl = `https://www.youtube.com/watch?v=${videoId}`;
-    const sanitizedTitle = title.replace(/[^a-z0-9\s]/gi, '_').replace(/\s+/g, '_').toLowerCase();
+    const videoUrl = url || `https://www.youtube.com/watch?v=${videoId}`;
+    const sanitizedTitle = sanitizeFilename(title);
     
     // Download directly to user's Downloads folder
     const userDownloadsFolder = getUserDownloadsFolder();
@@ -66,7 +91,8 @@ app.post('/download', (req, res) => {
         '360p': 'bestvideo[height<=360]+bestaudio/best[height<=360]',
         '480p': 'bestvideo[height<=480]+bestaudio/best[height<=480]',
         '720p': 'bestvideo[height<=720]+bestaudio/best[height<=720]',
-        '1080p': 'bestvideo[height<=1080]+bestaudio/best[height<=1080]'
+        '1080p': 'bestvideo[height<=1080]+bestaudio/best[height<=1080]',
+        'max': 'bestvideo+bestaudio/best'
       };
       
       const formatString = qualityMap[quality] || 'best';
@@ -80,7 +106,8 @@ app.post('/download', (req, res) => {
         '360p': 'bestvideo[height<=360]+bestaudio/best[height<=360]',
         '480p': 'bestvideo[height<=480]+bestaudio/best[height<=480]',
         '720p': 'bestvideo[height<=720]+bestaudio/best[height<=720]',
-        '1080p': 'bestvideo[height<=1080]+bestaudio/best[height<=1080]'
+        '1080p': 'bestvideo[height<=1080]+bestaudio/best[height<=1080]',
+        'max': 'bestvideo+bestaudio/best'
       };
       
       const formatString = qualityMap[quality] || 'best';
@@ -167,7 +194,7 @@ app.get('/health', (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`YouTube Downloader Server running on http://localhost:${PORT}`);
+  console.log(`Social Video Downloader Server running on http://localhost:${PORT}`);
   console.log('Downloads will be saved to:', getUserDownloadsFolder());
   console.log('Checking yt-dlp installation...');
   
