@@ -42,6 +42,37 @@ function sanitizeFilename(input) {
   return cleaned || fallback;
 }
 
+function buildSingleVideoUrl(url, videoId, source) {
+  const isYouTubeSource = source === 'youtube' || videoId || (url && (url.includes('youtube.com') || url.includes('youtu.be')));
+
+  if (!isYouTubeSource) {
+    return url || '';
+  }
+
+  // Always prefer a canonical single-video YouTube URL so playlist params (list/index/start_radio)
+  // never trigger huge "Mix" downloads.
+  if (videoId) {
+    return `https://www.youtube.com/watch?v=${videoId}`;
+  }
+
+  try {
+    const parsed = new URL(url);
+    let extractedVideoId = parsed.searchParams.get('v');
+
+    if (!extractedVideoId && parsed.hostname.includes('youtu.be')) {
+      extractedVideoId = parsed.pathname.split('/').filter(Boolean)[0] || '';
+    }
+
+    if (extractedVideoId) {
+      return `https://www.youtube.com/watch?v=${extractedVideoId}`;
+    }
+  } catch (error) {
+    // Keep the original URL if parsing fails.
+  }
+
+  return url || '';
+}
+
 // Check if yt-dlp is installed
 function checkYtDlp(callback) {
   exec('yt-dlp --version', (error, stdout, stderr) => {
@@ -55,7 +86,7 @@ function checkYtDlp(callback) {
 
 // Download video endpoint
 app.post('/download', (req, res) => {
-  const { videoId, url, title, quality, format } = req.body;
+  const { videoId, url, source, title, quality, format } = req.body;
   
   if (!videoId && !url) {
     return res.status(400).json({ success: false, error: 'Video URL is required' });
@@ -69,7 +100,7 @@ app.post('/download', (req, res) => {
       });
     }
 
-    const videoUrl = url || `https://www.youtube.com/watch?v=${videoId}`;
+    const videoUrl = buildSingleVideoUrl(url, videoId, source);
     const sanitizedTitle = sanitizeFilename(title);
     
     // Download directly to user's Downloads folder
@@ -82,7 +113,7 @@ app.post('/download', (req, res) => {
       // Download audio only as MP3
       expectedExtension = 'mp3';
       outputTemplate = path.join(userDownloadsFolder, `${sanitizedTitle}.${expectedExtension}`);
-      ytDlpCommand = `yt-dlp -x --audio-format mp3 --audio-quality 0 -o "${outputTemplate}" "${videoUrl}"`;
+      ytDlpCommand = `yt-dlp --no-playlist -x --audio-format mp3 --audio-quality 0 -o "${outputTemplate}" "${videoUrl}"`;
     } else if (format === 'mov') {
       // Download video as MOV - use recode-video to ensure compatibility
       expectedExtension = 'mov';
@@ -96,8 +127,8 @@ app.post('/download', (req, res) => {
       };
       
       const formatString = qualityMap[quality] || 'best';
-      // Use recode-video to convert to MOV with H.264 codec (compatible with MOV container)
-      ytDlpCommand = `yt-dlp -f "${formatString}" --recode-video mov -o "${outputTemplate}" "${videoUrl}"`;
+      // Force QuickTime-friendly codecs (H.264 + AAC) so .mov opens reliably on macOS.
+      ytDlpCommand = `yt-dlp --no-playlist -f "${formatString}" --recode-video mov --postprocessor-args "VideoConvertor:-c:v libx264 -pix_fmt yuv420p -c:a aac -b:a 192k -movflags +faststart" -o "${outputTemplate}" "${videoUrl}"`;
     } else {
       // Download video as MP4
       expectedExtension = 'mp4';
@@ -111,7 +142,7 @@ app.post('/download', (req, res) => {
       };
       
       const formatString = qualityMap[quality] || 'best';
-      ytDlpCommand = `yt-dlp -f "${formatString}" --merge-output-format mp4 -o "${outputTemplate}" "${videoUrl}"`;
+      ytDlpCommand = `yt-dlp --no-playlist -f "${formatString}" --merge-output-format mp4 -o "${outputTemplate}" "${videoUrl}"`;
     }
 
     console.log('Executing:', ytDlpCommand);
